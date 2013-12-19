@@ -14,6 +14,7 @@ module Edmodo
 
       attr_reader :api_key
       attr_reader :mode
+      attr_reader :access_token
     
       # Initializes a new instance of the Edmodo API client
       # Options:
@@ -27,11 +28,13 @@ module Edmodo
         @format = options[:format]
         @mode = options[:mode]
         @api_key = (api_key || ENV['EDMODO_API_KEY'] || "").strip
+        @access_token = options[:access_token] if options[:access_token]
 
         raise_init_errors
 
-        # Adding the api key as a default parameter to all requests
+        # Adding the api key and access_token as a default parameter to all requests
         self.class.default_params :api_key => @api_key
+        self.class.default_params :access_token => @access_token if @access_token
 
         @endpoint = Edmodo::API::Config.endpoints[@mode]
 
@@ -44,7 +47,10 @@ module Edmodo
       #
       # => launch_key: launch_key that was passed to the application's server.
       def launch_requests launch_key
-        request :get, resource_uri("launchRequests", @format), {:launch_key => launch_key}
+        resp = request :get, resource_uri("launchRequests", @format), {:launch_key => launch_key}
+        self.class.default_params :access_token => resp["access_token"]
+
+        return resp
       end
 
       # Returns user data for a given user token or array of user tokens.

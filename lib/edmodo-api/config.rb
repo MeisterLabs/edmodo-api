@@ -7,7 +7,7 @@ module Edmodo
 				attr_accessor :version
 			end
 
-			self.version = "v1"
+			self.version = "v1.1"
 			self.endpoints = {
 				:production => "https://appsapi.edmodo.com/#{version}",
 				:sandbox => "https://appsapi.edmodobox.com/#{version}"
